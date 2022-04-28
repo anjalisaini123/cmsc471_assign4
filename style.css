@@ -1,5 +1,5 @@
 body {
-  background-color: aquamarine;
+  background-color: white;
 }
 
 #sections {
@@ -23,7 +23,7 @@ body {
 
   height: 620px;
   width: 620px;
-  background-color: #ddd;
+  /* background-color: #ddd; */
 }
 
 .avgTsDiameterLabel,
@@ -34,10 +34,12 @@ body {
   font-family: sans-serif;
 }
 
-.dotLabel text {
+.tsCircle text,
+.huCircle text {
   opacity: 0;
 }
 
-.dotLabel:hover text {
+.tsCircle:hover text,
+.huCircle:hover text {
   opacity: 1;
 }
