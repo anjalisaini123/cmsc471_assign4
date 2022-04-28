@@ -12,6 +12,7 @@ body {
 
 .step {
   margin-bottom: 700px;
+  padding-right: 40px;
 }
 
 #vis {
@@ -29,7 +30,10 @@ body {
 .avgTsDiameterLabel,
 .lengthOfStormTsLabel,
 .avgHuDiameterLabel,
-.lengthOfStormHuLabel {
+.lengthOfStormHuLabel,
+.tsLabel,
+.huLabel,
+.windLabel {
   font-size: small;
   font-family: sans-serif;
 }
@@ -41,7 +45,8 @@ body {
 
 .tsCircle:hover text,
 .huCircle:hover text {
-  opacity: 1;
+  /* opacity: 1; */
+  display: block;
   font-size: smaller;
 }
 
