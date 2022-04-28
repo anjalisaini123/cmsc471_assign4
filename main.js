@@ -403,7 +403,160 @@ function aggregateMonth() {
     // console.log(monthData)
     // console.log(countMonth)
 }
+function getMonthName(d) {
+    if (d.month == '1') {
+        return 'January';
+    }
+    else if (d.month == '4') {
+        return 'April';
+    }
+    else if (d.month == '5') {
+        return 'May';
+    }
+    else if (d.month == '6') {
+        return 'June';
+    }
+    else if (d.month == '7') {
+        return 'July';
+    }
+    else if (d.month == '8') {
+        return 'August';
+    }
+    else if (d.month == '9') {
+        return 'September';
+    }
+    else if (d.month == '10') {
+        return 'October';
+    }
+    else if (d.month == '11') {
+        return 'November';
+    }
+    else if (d.month == '12') {
+        return 'December';
+    }
+}
 
+function drawMonth(svg) {
+    //clean();
+
+    // scales
+    innerHeight = height - margin.bottom //- margin.bottom;
+    // var innerHeight = height - 60;
+    var innerWidth = width - margin.left - margin.right;
+
+    var lengthOfStormExtent = d3.extent(Object.values(monthData)); 
+    console.log(lengthOfStormExtent)
+    lengthOfStormYScale = d3.scaleLinear()
+        .domain([0,lengthOfStormExtent[1]])
+        .range([innerHeight, 0]);
+        // .range([height - margin.bottom, margin.top]);
+   
+    monthXScale = d3.scaleBand()
+        .domain(['January', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'])
+        .rangeRound([0, innerWidth])
+        .padding(0.2);
+
+    // create axes
+    var xAxisMonth = d3.axisBottom(monthXScale);
+    var yAxisAvgLengthOfStorm = d3.axisLeft(lengthOfStormYScale);
+    
+    // create bars
+
+    /*var barsEnter = svg
+                    .selectAll('.bar')
+                    .data(monthListData)
+                    .enter()
+                    .append('g')
+                    .attr('class', 'bar')
+                    .attr('opacity', 0)
+                    .attr('transform', function(d,i){
+                        // return 'translate('+[i * 30 + 100, 0]+')';
+                        return 'translate(' + (monthXScale(getMonthName(d))+40) + ',0)';
+                    });*/
+    var barsEnter = svg
+                    .selectAll('.bar')
+                    .data(monthListData)
+                    .enter()
+    barsEnter
+        .append('rect')
+        .attr('class', 'bar')
+        .attr('opacity', 0)
+        .attr('y', innerHeight) //setting y at the bottom for the transition effect
+        .attr('x', function(d) { return (monthXScale(getMonthName(d))+40)})
+        .attr('height', 0)      //setting height 0 for the transition effect
+        .attr('width', monthXScale.bandwidth())
+        .style('fill', 'rgb(234, 229, 229)');
+        /*.transition()
+        .duration(700)
+        .ease(d3.easeLinear)
+        .attr('height', function(d) {
+            return innerHeight - lengthOfStormYScale(d.avgLengthOfStorm);
+        })
+        .attr('y', function(d) {
+            return lengthOfStormYScale(d.avgLengthOfStorm);
+        })
+        .style('fill', 'rgb(70, 130, 180)'); */
+
+        // .attr('height', function(d) {
+        //     return height - lengthOfStormYScale(d.avgLengthOfStorm);
+        // })
+        // .attr('y', function(d) { 
+        //     return lengthOfStormYScale(d.avgLengthOfStorm); 
+        // })
+        // .attr('width', 30);
+
+
+
+    // var barsEnter = bars.enter()
+    // .append('g')
+    // .attr('class', 'bar');
+    
+    // bars.merge(barsEnter)
+    // .attr('transform', function(d,i){
+    //         return 'translate('+[0, i * barBand + 4]+')';
+    //     });
+
+    
+
+    // barsEnter.append('text')
+    //     .attr('x', -20)
+    //     .attr('dy', '0.9em')
+    //     .text(function(d){
+    //         return d.letter;
+    //     });        
+
+    // axes
+    // x axis
+    svg.append('g')
+		.attr('class', 'monthAxis')
+        .attr('opacity',0)
+        // .attr('transform', 'translate(0,580)')
+        .attr('transform', 'translate(40,' + (height - margin.top + 10) + ')')
+        .call(xAxisMonth);
+    svg
+        .append('text')
+        .attr('class', 'monthLabel')
+        .attr('opacity',0)
+        .attr('transform', 'translate(250,' + (height - margin.top + 40) + ')')
+        .text('Month');
+
+    // y axis
+    svg
+        .append('g')
+        .attr('class', 'monthAxis')
+        .attr('opacity',0)
+        .attr('transform', 'translate(' + (margin.left - 10) + ', 0)')
+        .call(yAxisAvgLengthOfStorm)
+    svg    
+        .append('text')
+        .attr('class', 'monthLabel')
+        .attr('opacity',0)
+        .attr('transform', 'translate(10, 400) rotate(270)')
+        .text('Average Length of Storm (Hours)');
+
+}
+
+/*
 function drawMonth(svg) {
     //clean();
 
@@ -457,7 +610,7 @@ function drawMonth(svg) {
     //         return d.letter;
     //     });        
 
-}
+}*/
 
 d3.csv('storms.csv').then(function(dataset) {
     storms = dataset;
@@ -487,7 +640,7 @@ d3.csv('storms.csv').then(function(dataset) {
 let activationFunctions = [
     //clean, // dummy function
     draw1,
-    //drawBar,
+    drawBar,
     drawWind1,
     drawTs,
     drawHu,
@@ -601,12 +754,26 @@ function drawTs() {
 }
 
 function drawBar() {
+    clean('isBar');
+    console.log('drawbar');
     let svg = d3.select("#vis")
                     .select('svg')
                     .attr('width', 1000)
                     .attr('height', 950)
     svg.selectAll('.bar')
         .attr('opacity', 1)
+        .transition()
+        .duration(700)
+        .ease(d3.easeLinear)
+        .attr('height', function(d) {
+            return innerHeight - lengthOfStormYScale(d.avgLengthOfStorm);
+        })
+        .attr('y', function(d) {
+            return lengthOfStormYScale(d.avgLengthOfStorm);
+        })
+        .style('fill', 'rgb(70, 130, 180)'); 
+        svg.selectAll('.monthAxis').transition().attr('opacity', 1)
+        svg.selectAll('.monthLabel').transition().attr('opacity', 1)
 }
 
 function clean(chartType){
@@ -630,6 +797,13 @@ function clean(chartType){
         svg.selectAll('.huAxis').transition().attr('opacity', 0)
         svg.selectAll('.huLabel').transition().attr('opacity', 0)
         svg.selectAll('.huCircle')
+            .transition()
+            .attr('display','none')
+    }
+    if (chartType !== "isBar"){
+        svg.selectAll('.monthAxis').transition().attr('opacity', 0)
+        svg.selectAll('.monthLabel').transition().attr('opacity', 0)
+        svg.selectAll('.bar')
             .transition()
             .attr('display','none')
     }
