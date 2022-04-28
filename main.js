@@ -1,6 +1,6 @@
 
-width = 620;
-height = 620;
+width = 600;
+height = 550;
 margin = { top: 50, left: 50, bottom: 50, right: 50 };
 
 
@@ -57,25 +57,36 @@ function createData() {
 
 }
 
+/*
 function clean() {
     var svg = d3.select('svg');
     svg.remove();
-}
+} */
 
+function drawInitial() {
+    console.log("initial");
+    var svg = d3.select("#vis")
+        .append('svg')
+        .attr('width', 600)
+        .attr('height', 550);
+
+    drawTsDiameter(svg);
+    drawHuDiameter(svg);
+    drawWindSpeed(svg);
+    drawMonth(svg);
+}
 // diameter
-function drawTsDiameter() {
-    clean();
-    // create scales
-    // domains for scales 
-    var tsDiameterExtent = d3.extent(diameterData, function(d) {
+function drawTsDiameter(svg) {
+    //clean();
+
+    // create extents
+    tsDiameterExtent = d3.extent(diameterData, function(d) {
         return (d.avgTsDiameter);
     });
-    var lengthOfStormExtent = d3.extent(diameterData, function(d) {
+    lengthOfStormExtent = d3.extent(diameterData, function(d) {
         return (d.lengthOfStorm);
     });
-    // console.log(tsDiameterExtent);
-    // console.log(lengthOfStormExtent);
-
+    
     // scales
     // x axis is the max ts_diameter for a single storm
     tsDiameterXScale = d3.scaleLinear()
@@ -90,22 +101,19 @@ function drawTsDiameter() {
     // creating axes
     var xAxisTsDiameter = d3.axisBottom(tsDiameterXScale);
     var yAxisTsDiameter = d3.axisLeft(tsDiameterYScale);
-    
 
-    var svg = d3.select("#vis")
-                    .append('svg')
-                    .attr('width', 620)
-                    .attr('height', 620);
-    var tsCircles = svg.selectAll('.tsCircle')
+    // create circles
+    var tsCircles = svg.selectAll('g')
         .data(diameterData);
     var tsCirclesEnter = tsCircles.enter()
         .append('g')
         .attr('class', 'tsCircle')
+        .attr('display', 'none')
         .attr('transform', function(d) {
             var tx = tsDiameterXScale(d['avgTsDiameter']);
-            var ty = tsDiameterYScale(d['lengthOfStorm']);
+            var ty = height - margin.top;
             return 'translate('+[tx, ty]+')';
-        });
+        }); 
     tsCirclesEnter.append('circle')
         // .attr('cx', function(d) {
         //     // console.log("in cx")
@@ -115,82 +123,69 @@ function drawTsDiameter() {
         // .attr('cy', function(d) {
         //     return tsDiameterYScale(d['lengthOfStorm']);
         // })
+        //.attr('class', 'tsCircle')
         .attr('fill', 'blue')
-        .attr('r', 4);
-    tsCircles.attr('transform', function(d) {
+        .attr('r', 4)
+        //.attr('cx', (d, i) => tsDiameterXScale(d['avgTsDiameter']))
+        //.attr('cy', height - margin.top);
+    /*tsCircles.attr('transform', function(d) {
         var tx = tsDiameterXScale(d['avgTsDiameter']);
         var ty = tsDiameterYScale(d['lengthOfStorm']);
         return 'translate('+[tx, ty]+')';
-    });
+    });*/
 
-    
     // add text to each dot for hover
     tsCirclesEnter.append('text')
+    .attr('class', 'tsText')
         .attr('y', -10)
+        .attr('display', 'none')
         .text(function(d) {
             return d.nameyear;
         });
 
-
-    // svg 
-    //     .selectAll('circle')
-    //     .data(diameterData)
-    //     .enter()
-    //     .append('circle')
-    //     .attr('cx', function(d) {
-    //         // console.log("in cx")
-    //         // console.log(tsDiameterXScale(d['ts_diameter']))
-    //         return tsDiameterXScale(d['avgTsDiameter']);
-    //     })
-    //     .attr('cy', function(d) {
-    //         return tsDiameterYScale(d['lengthOfStorm']);
-    //     })
-    //     .attr('fill', 'blue')
-    //     .attr('r', 4);
-    
-    
-
-    
     // add axes
     // x axis
     svg.append('g')
-		.attr('class', 'avgTsDiameter')
-		.attr('transform', 'translate(0,580)')
+		.attr('class', 'tsAxis')
+		.attr('transform', 'translate(0,' + (height - margin.top + 10) + ')')
+        .attr('opacity', 0)
         .call(xAxisTsDiameter);
     svg
         .append('text')
-        .attr('class', 'avgTsDiameterLabel')
-        .attr('transform', 'translate(250, 610)')
+        .attr('class', 'tsLabel')
+        .attr('opacity', 0)
+        .attr('transform', 'translate(250,' + (height - margin.top + 40) + ')')
         .text('Diameter (Nautical Miles)');
     
     // y axis
     svg
         .append('g')
-        .attr('class', 'lengthOfStormTs')
-        .attr('transform', 'translate(40, 0)')
+        .attr('class', 'tsAxis')
+        .attr('id', 'tsYAxis')
+        .attr('opacity', 0)
+        .attr('transform', 'translate(' + (margin.left - 10) + ', 0)')
         .call(yAxisTsDiameter)
     svg    
         .append('text')
-        .attr('class', 'lengthOfStormTsLabel')
+        .attr('class', 'tsLabel')
+        .attr('opacity', 0)
         .attr('transform', 'translate(10, 400) rotate(270)')
         .text('Length of Storm (Hours)');
 
 }
 
 
-function drawHuDiameter() {
-    clean();
+function drawHuDiameter(svg) {
+    //clean();
     // create scales
 
     // domains for scales 
-    var huDiameterExtent = d3.extent(diameterData, function(d) {
+    huDiameterExtent = d3.extent(diameterData, function(d) {
         return (d.avgHuDiameter);
     });
-    var lengthOfStormExtent = d3.extent(diameterData, function(d) {
+    lengthOfStormExtent = d3.extent(diameterData, function(d) {
         return (d.lengthOfStorm);
     });
-    // console.log(huDiameterExtent);
-    // console.log(lengthOfStormExtent);
 
     // scales
     // x axis is the avg hu_diameter for a single storm
@@ -207,19 +202,16 @@ function drawHuDiameter() {
     var xAxisHuDiameter = d3.axisBottom(huDiameterXScale);
     var yAxisHuDiameter = d3.axisLeft(huDiameterYScale);
     
-
-    var svg = d3.select("#vis")
-                    .append('svg')
-                    .attr('width', 620)
-                    .attr('height', 620);
+    // create circles
     var huCircles = svg.selectAll('.huCircle')
         .data(diameterData);
     var huCirclesEnter = huCircles.enter()
         .append('g')
         .attr('class', 'huCircle')
+        .attr('display', 'none')
         .attr('transform', function(d) {
             var tx = huDiameterXScale(d['avgHuDiameter']);
-            var ty = huDiameterYScale(d['lengthOfStorm']);
+            var ty = height - margin.top;
             return 'translate('+[tx, ty]+')';
         });
     huCirclesEnter.append('circle')
@@ -232,60 +224,47 @@ function drawHuDiameter() {
         //     return tsDiameterYScale(d['lengthOfStorm']);
         // })
         .attr('fill', 'blue')
-        .attr('r', 4);
-    huCircles.attr('transform', function(d) {
+        .attr('r', 4)
+    /*huCircles.attr('transform', function(d) {
         var tx = huDiameterXScale(d['avgHuDiameter']);
         var ty = huDiameterYScale(d['lengthOfStorm']);
         return 'translate('+[tx, ty]+')';
-    });
+    });*/
 
     
     // add text to each dot for hover
     huCirclesEnter.append('text')
         .attr('y', -10)
+        .attr('display', 'none')
         .text(function(d) {
             return d.nameyear;
         });
-
-    // svg 
-    //     .selectAll('circle')
-    //     .data(diameterData)
-    //     .enter()
-    //     .append('circle')
-    //     .attr('cx', function(d) {
-    //         // console.log("in cx")
-    //         // console.log(huDiameterXScale(d['ts_diameter']))
-    //         return huDiameterXScale(d['avgHuDiameter']);
-    //     })
-    //     .attr('cy', function(d) {
-    //         return huDiameterYScale(d['lengthOfStorm']);
-    //     })
-    //     .attr('fill', 'blue')
-    //     .attr('r', 4);
-
-
     
     // add axes
     // x axis
     svg.append('g')
-		.attr('class', 'avgHuDiameter')
-		.attr('transform', 'translate(0,580)')
+		.attr('class', 'huAxis')
+		.attr('transform', 'translate(0,' + (height - margin.top + 10) + ')')
+        .attr('opacity', 0)
         .call(xAxisHuDiameter);
     svg
         .append('text')
-        .attr('class', 'avgHuDiameterLabel')
-        .attr('transform', 'translate(250, 610)')
+        .attr('class', 'huLabel')
+        .attr('opacity', 0)
+        .attr('transform', 'translate(250,' + (height - margin.top + 40) + ')')
         .text('Diameter (Nautical Miles)');
     
     // y axis
     svg
         .append('g')
-        .attr('class', 'lengthOfStormHu')
-        .attr('transform', 'translate(40, 0)')
+        .attr('class', 'huAxis')
+        .attr('opacity', 0)
+        .attr('transform', 'translate(' + (margin.left - 10) + ', 0)')
         .call(yAxisHuDiameter)
     svg    
         .append('text')
-        .attr('class', 'lengthOfStormHuLabel')
+        .attr('class', 'huLabel')
+        .attr('opacity', 0)
         .attr('transform', 'translate(10, 400) rotate(270)')
         .text('Length of Storm (Hours)');
 
@@ -294,17 +273,21 @@ function drawHuDiameter() {
 
 
 // wind speed
-
+/*
 function createDiameterScales() {
     tsDiameterXScale = d3.scaleLinear(d3.extent(storms, d => d.ts_diameter), [margin.left, margin.left + width+250]);
     tsDiameterYScale = d3.scaleLinear(d3.extent(storms, d => d.nameyear), [margin.top, margin.top + height+250]);
-}
+} */
 
 function createWindSpeedScales() {
     //windSpeedXScale = d3.scaleLinear(d3.extent(dataset, d => d.windSpeed), [0, 450]);
-    windSpeedXScale = d3.scaleLinear([0,110], [0, 450]);
+    windSpeedXScale = d3.scaleLinear()
+        .domain([0,110])
+        .range([margin.left, width - margin.right]);
     //windSpeedYScale = d3.scaleLinear(d3.extent(dataset, d => d.length), [30+500, 30]);
-    windSpeedYScale = d3.scaleLinear([0,500], [30+500, 30]);
+    windSpeedYScale = d3.scaleLinear()
+        .domain([0,0])
+        .range([height - margin.top, margin.top]);
     var nodeTypes = d3.map(filteredStorm, function(d){return d.type;}).keys();
     colorScale = d3.scaleOrdinal(d3.schemeCategory10).domain(nodeTypes);
 }
@@ -313,39 +296,82 @@ function filterStorm() {
     filteredStorm = d3.nest()
         .key(function(d) { return d.nameyear;})
         .entries(storms);
-        filteredStorm.forEach((s,index) => {
+    filteredStorm.forEach((s,index) => {
             filteredStorm[index] = s.values[0];
     });
+    filteredStorm.sort(function (a, b) {
+        return a.windSpeed - b.windSpeed;
+      });
     // return nest;
 }
 
-function drawWindSpeed() {
-    clean();
-    var svg = d3.select("#vis")
-                .append('svg')
-                .attr('width', 450)
-                .attr('height', 500);
+function createWindCircles(windClass, svg) {
+    // create circles
 
-    var g = svg.selectAll("g")
-    .data(filteredStorm)
-    .enter()
-    .append("g")
-    .attr("transform", function(d) {
-        return "translate(" + windSpeedXScale(d.windSpeed)+ ", " + windSpeedYScale(d.lengthOfStorm) + ")";
-    })
+    var windCircles = svg.selectAll('.'+windClass)
+        .data(filteredStorm)
+    var windCirclesEnter = windCircles.enter()
+        //.append("g")
+        /*.attr("transform", function(d) {
+            return "translate(" + windSpeedXScale(d.windSpeed)+ ", " + windSpeedYScale(d.lengthOfStorm) + ")";
+        })*/
     
-    g.append("circle")
+    windCirclesEnter.append("circle")
         .attr("r", 2)
+        .attr('display', 'none')
+        .attr('class', windClass)
+        .attr('cx', (d, i) => windSpeedXScale(d.windSpeed))
+        .attr('cy', height - margin.top)
+        //.attr('cy', (d, i) => windSpeedYScale(d.lengthOfStorm))
         .style('fill', function(d){
                 return colorScale(d.category);
             });
+}
+function drawWindSpeed(svg) {
+    //clean();
+    createWindSpeedScales();
+    createWindCircles('windCircle', svg);
+    
 
-    svg.append('g').attr('class', 'x axis')
+    // creating axes
+    var xAxisWindSpeed = d3.axisBottom(windSpeedXScale);
+    var yAxisWindSpeed = d3.axisLeft(windSpeedYScale);
+
+    // add axes
+    // x axis
+    svg.append('g')
+		.attr('class', 'windAxis')
+        .attr('opacity', 0)
+		.attr('transform', 'translate(0,' + (height - margin.top + 10) + ')')
+        .call(xAxisWindSpeed);
+    svg
+        .append('text')
+        .attr('class', 'windLabel')
+        .attr('opacity', 0)
+        .attr('transform', 'translate(250,' + (height - margin.top + 40) + ')')
+        .text('Average Wind Speed (knots)');
+    
+    // y axis
+    svg
+        .append('g')
+        .attr('class', 'windAxis')
+        .attr('id', 'windYAxis')
+        .attr('opacity', 0)
+        .attr('transform', 'translate(' + (margin.left - 10) + ', 0)')
+        .call(yAxisWindSpeed)
+    svg    
+        .append('text')
+        .attr('class', 'windLabel')
+        .attr('opacity', 0)
+        .attr('transform', 'translate(10, 400) rotate(270)')
+        .text('Length of Storm (Hours)');
+
+    /*svg.append('g').attr('class', 'x axis')
         .attr('transform', 'translate(0,500)')
         .call(d3.axisTop(windSpeedXScale).tickFormat(function(d){return d;}));
     svg.append('g').attr('class', 'y axis')
         .attr('transform', 'translate(0,0)')
-        .call(d3.axisRight(windSpeedYScale).tickFormat(function(d){return d;}));
+        .call(d3.axisRight(windSpeedYScale).tickFormat(function(d){return d;}));*/
         
         /* .attr("class", function(d) {
         return d.rank <=3 ? 'topPlayers': 'normalPlayers';
@@ -378,8 +404,8 @@ function aggregateMonth() {
     // console.log(countMonth)
 }
 
-function drawMonth() {
-    clean();
+function drawMonth(svg) {
+    //clean();
 
     // scales
     var lengthOfStormExtent = d3.extent(Object.values(monthData)); 
@@ -390,11 +416,6 @@ function drawMonth() {
 
     
     // create bars
-    var svg = d3.select("#vis")
-                .append('svg')
-                .attr('width', 620)
-                .attr('height', 620);
-
     
     var barsEnter = svg
                     .selectAll('.bar')
@@ -402,6 +423,7 @@ function drawMonth() {
                     .enter()
                     .append('g')
                     .attr('class', 'bar')
+                    .attr('opacity', 0)
                     .attr('transform', function(d,i){
                         return 'translate('+[i * 10 + 4, 0]+')';
                     });
@@ -437,15 +459,25 @@ function drawMonth() {
 
 }
 
-
-
 d3.csv('storms.csv').then(function(dataset) {
     storms = dataset;
+    /*console.log(storms);
+    storms = storms.filter(function (e) {
+        let valid = true;
+        Object.keys(e).forEach(key => {
+            if (e[key] == "NA") {
+                valid = false;
+            }
+        })
+        return valid;
+    });
+    console.log(storms)*/
     computeLengthOfStorm();
     createData();
     filterStorm();
-    createWindSpeedScales();
+    //createWindSpeedScales();
     aggregateMonth();
+    drawInitial();
     // drawMonth();
 });
 
@@ -453,13 +485,155 @@ d3.csv('storms.csv').then(function(dataset) {
 // scrolling through
 
 let activationFunctions = [
-    clean, // dummy function
+    //clean, // dummy function
+    draw1,
+    //drawBar,
+    drawWind1,
+    drawTs,
+    drawHu,
+    drawTs,
+    drawWind1,
+    drawTs,
+    drawInitial,
     drawWindSpeed,
     drawTsDiameter,
     drawHuDiameter,
     drawMonth,
     clean // dummy function
 ]
+
+function draw1() {
+
+}
+
+function drawWind1() {
+    clean('isWindSpeed');
+    console.log("draw2");
+    let svg = d3.select("#vis")
+                    .select('svg')
+                    .attr('width', 1000)
+                    .attr('height', 950)
+
+    svg.selectAll('.windAxis')
+        .attr('opacity', 1)
+    svg.selectAll('.windLabel')
+        .attr('opacity', 1)
+
+    windSpeedYScale.domain([0,500])
+        .range([height - margin.top, margin.top]);
+
+    svg.select("#windYAxis")
+    .transition()
+    .call(d3.axisLeft(windSpeedYScale));
+
+    svg.selectAll('.windCircle')
+        .transition().duration(1000)
+        .delay(function(d,i){return(i*3)})
+        .attr('display','block')
+        .attr('cx', (d) => windSpeedXScale(d.windSpeed))
+        .attr('cy', (d) => windSpeedYScale(d.lengthOfStorm))
+    
+}
+
+function drawHu() {
+    console.log("drawHu");
+    clean('isHu');
+    let svg = d3.select("#vis")
+                    .select('svg')
+                    .attr('width', 1000)
+                    .attr('height', 950)
+
+    svg.selectAll('.huAxis')
+        .attr('opacity', 1)
+    svg.selectAll('.huLabel')
+        .attr('opacity', 1)
+
+    huDiameterYScale = d3.scaleLinear()
+        .domain(lengthOfStormExtent)
+        .range([height - margin.top, margin.top]);
+    /*svg.select("#tsYAxis")
+    .transition()
+    .call(d3.axisLeft(tsDiameterYScale));*/
+
+    svg.selectAll('.huCircle')
+        .transition().duration(1000)
+        .delay(function(d,i){return(i*3)})
+        .attr('display','block')
+        .attr('transform', function(d) {
+            var tx = huDiameterXScale(d['avgHuDiameter']);
+            var ty = huDiameterYScale(d['lengthOfStorm']);
+            return 'translate('+[tx, ty]+')';
+        });
+    
+}
+
+function drawTs() {
+    console.log("drawTs");
+    clean('isTs');
+    let svg = d3.select("#vis")
+                    .select('svg')
+                    .attr('width', 1000)
+                    .attr('height', 950)
+
+    svg.selectAll('.tsAxis')
+        .attr('opacity', 1)
+    svg.selectAll('.tsLabel')
+        .attr('opacity', 1)
+
+    tsDiameterYScale = d3.scaleLinear()
+        .domain(lengthOfStormExtent)
+        .range([height - margin.top, margin.top]);
+
+    svg.select("#tsYAxis")
+    .transition()
+    .call(d3.axisLeft(tsDiameterYScale));
+
+    svg.selectAll('.tsCircle')
+        .transition().duration(1000)
+        .delay(function(d,i){return(i*3)})
+        .attr('display','block')
+        .attr('transform', function(d) {
+            var tx = tsDiameterXScale(d['avgTsDiameter']);
+            var ty = tsDiameterYScale(d['lengthOfStorm']);
+            return 'translate('+[tx, ty]+')';
+        });
+    
+}
+
+function drawBar() {
+    let svg = d3.select("#vis")
+                    .select('svg')
+                    .attr('width', 1000)
+                    .attr('height', 950)
+    svg.selectAll('.bar')
+        .attr('opacity', 1)
+}
+
+function clean(chartType){
+    let svg = d3.select('#vis').select('svg')
+    if (chartType !== "isWindSpeed") {
+        svg.selectAll('.windAxis').transition().attr('opacity', 0)
+        svg.selectAll('.windLabel').transition().attr('opacity', 0)
+        svg.selectAll('.windCircle')
+            .transition()
+            .attr('display','none')
+
+    }
+    if (chartType !== "isTs"){
+        svg.selectAll('.tsAxis').transition().attr('opacity', 0)
+        svg.selectAll('.tsLabel').transition().attr('opacity', 0)
+        svg.selectAll('.tsCircle')
+            .transition()
+            .attr('display','none')
+    }
+    if (chartType !== "isHu"){
+        svg.selectAll('.huAxis').transition().attr('opacity', 0)
+        svg.selectAll('.huLabel').transition().attr('opacity', 0)
+        svg.selectAll('.huCircle')
+            .transition()
+            .attr('display','none')
+    }
+}
 
 let scroll = scroller()
     .container(d3.select('#graphic'))

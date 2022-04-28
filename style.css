@@ -12,6 +12,7 @@ body {
 
 .step {
   margin-bottom: 700px;
+  padding-right: 40px;
 }
 
 #vis {
@@ -21,15 +22,18 @@ body {
   z-index: 1;
   margin-left: 0;
 
-  height: 620px;
-  width: 620px;
-  /* background-color: #ddd; */
+  height: 550px;
+  width: 600px;
+   background-color: #ddd; 
 }
 
 .avgTsDiameterLabel,
 .lengthOfStormTsLabel,
 .avgHuDiameterLabel,
-.lengthOfStormHuLabel {
+.lengthOfStormHuLabel,
+.tsLabel,
+.huLabel,
+.windLabel {
   font-size: small;
   font-family: sans-serif;
 }
@@ -41,7 +45,8 @@ body {
 
 .tsCircle:hover text,
 .huCircle:hover text {
-  opacity: 1;
+  /*opacity: 1;*/
+  display: block;
   font-size: smaller;
 }
 
