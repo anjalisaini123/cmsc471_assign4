@@ -42,4 +42,10 @@ body {
 .tsCircle:hover text,
 .huCircle:hover text {
   opacity: 1;
+  font-size: smaller;
+}
+
+.tsCircle:hover circle,
+.huCircle:hover circle {
+  fill: aquamarine;
 }
